@@ -31,6 +31,11 @@ on:
         type: boolean
         description: >
           Enable KernelSU
+      sukisu:
+        required: true
+        type: boolean
+        description: >
+          Enable SukiSU-Ultra
 
 jobs:
   build:
@@ -70,11 +75,24 @@ jobs:
         cd ./android-kernel/common
         git apply $GITHUB_WORKSPACE/gki-patch/patchs/*.patch
 
+    - name: Validate root solution selection
+      run: |
+        if [[ "${{ inputs.kernelsu }}" == "true" && "${{ inputs.sukisu }}" == "true" ]]; then
+          echo "Error: Cannot enable both KernelSU and SukiSU-Ultra at the same time"
+          exit 1
+        fi
+
     - name: KernelSU
       if: ${{ inputs.kernelsu == true }}
       run: |
           cd $GITHUB_WORKSPACE/android-kernel
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+
+    - name: SukiSU-Ultra
+      if: ${{ inputs.sukisu == true }}
+      run: |
+          cd $GITHUB_WORKSPACE/android-kernel
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -
 
     - name: Build Kernel
       run: |
