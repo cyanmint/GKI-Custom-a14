@@ -2,6 +2,8 @@
 
 Enable LXC, Docker support for GKI Kernel
 
+Also supports integrating KernelSU or SukiSU-Ultra as root solutions (mutually exclusive).
+
 # Build
 
 If you don't want to build it yourself, you can jump to the [actions](https://github.com/TapetalArray/GKI-Custom/actions) to download or fork repo run a new workflow
