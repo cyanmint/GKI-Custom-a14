@@ -36,6 +36,11 @@ on:
         type: boolean
         description: >
           Enable SukiSU-Ultra
+      susfs:
+        required: true
+        type: boolean
+        description: >
+          Enable SUSFS (requires KernelSU)
 
 jobs:
   build:
@@ -89,6 +94,14 @@ jobs:
           echo "Error: Cannot enable both KernelSU and SukiSU-Ultra at the same time"
           exit 1
         fi
+        if [[ "${{ inputs.susfs }}" == "true" && "${{ inputs.kernelsu }}" == "false" ]]; then
+          echo "Error: SUSFS requires KernelSU to be enabled"
+          exit 1
+        fi
+        if [[ "${{ inputs.susfs }}" == "true" && "${{ inputs.sukisu }}" == "true" ]]; then
+          echo "Error: SUSFS is only compatible with KernelSU, not SukiSU-Ultra"
+          exit 1
+        fi
 
     - name: KernelSU
       if: ${{ inputs.kernelsu == true }}
@@ -101,6 +114,23 @@ jobs:
       run: |
           cd $GITHUB_WORKSPACE/android-kernel
           curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -
+
+    - name: SUSFS
+      if: ${{ inputs.susfs == true }}
+      run: |
+          cd $GITHUB_WORKSPACE
+          SUSFS_BRANCH="gki-android13-5.15"
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH" --depth 1
+          
+          cd $GITHUB_WORKSPACE/android-kernel/KernelSU
+          cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 < 10_enable_susfs_for_ksu.patch
+          
+          cd $GITHUB_WORKSPACE/android-kernel/common
+          cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/fs/susfs.c fs/
+          cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/include/linux/susfs.h include/linux/
+          cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/50_add_susfs_in_gki-android13-5.15.patch ./
+          patch -p1 < 50_add_susfs_in_gki-android13-5.15.patch
 
     - name: Build Kernel
       run: |
@@ -143,6 +173,9 @@ jobs:
         git clone https://github.com/Kernel-SU/AnyKernel3
         rm -rf ./AnyKernel3/.git
         cp $OUTDIR/Image ./AnyKernel3/
+        cd ./AnyKernel3
+        zip -r9 ../output/${{ inputs.version_name }}_${{ inputs.os_patch_level }}-AnyKernel3.zip * -x .git README.md *placeholder
+        cd $GITHUB_WORKSPACE
         wget https://dl.google.com/android/gki/gki-certified-boot-android13-5.15-${{ inputs.os_patch_level }}_r1.zip -O ./gki-kernel.zip
         unzip -q ./gki-kernel.zip
         rm ./gki-kernel.zip

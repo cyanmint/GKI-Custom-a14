@@ -2,7 +2,21 @@
 
 Enable LXC, Docker support for GKI Kernel
 
-Also supports integrating KernelSU or SukiSU-Ultra as root solutions (mutually exclusive).
+Also supports integrating KernelSU, SukiSU-Ultra, or KernelSU with SUSFS as root solutions.
+
+## Root Solutions
+
+- **KernelSU**: A kernel-based root solution for Android GKI devices
+- **SukiSU-Ultra**: An alternative root solution (mutually exclusive with KernelSU)
+- **SUSFS**: An addon root hiding kernel patches for KernelSU (requires KernelSU to be enabled)
+
+**Note**: KernelSU and SukiSU-Ultra are mutually exclusive. SUSFS can only be used with KernelSU, not with SukiSU-Ultra.
+
+## Artifacts
+
+The build process creates both traditional boot images and AnyKernel3 flashable ZIPs:
+- Boot images: `boot.img`, `boot-lz4.img`, `boot-gz.img`
+- AnyKernel3 ZIP: Can be flashed via custom recovery (TWRP, etc.)
 
 # Build
 
@@ -46,3 +60,7 @@ Create the img file, Download boot from [gki-release-builds](https://source.andr
 # Credits
 
 [lateautumn233](https://github.com/lateautumn233)
+
+[simonpunk (SUSFS)](https://gitlab.com/simonpunk/susfs4ksu)
+
+[WildKernels (GKI_KernelSU_SUSFS)](https://github.com/WildKernels/GKI_KernelSU_SUSFS)
