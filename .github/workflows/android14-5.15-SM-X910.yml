@@ -82,11 +82,10 @@ jobs:
       if: ${{ inputs.custom == true }}
       run: |
         cd $GITHUB_WORKSPACE
-        git clone https://github.com/rvalyi/GKI-Custom.git gki-patch
         # FIXME FIXME FIXME: inject the LXC settings properly, see the diff I put in config...
-        # cp ./gki-patch/config/gki_defconfig-android13-5.15 ./android-kernel/common/arch/arm64/configs/gki_defconfig
+        # cp ./config/gki_defconfig-android13-5.15 ./android-kernel/common/arch/arm64/configs/gki_defconfig
         cd ./android-kernel/common
-        git apply $GITHUB_WORKSPACE/gki-patch/patchs/*.patch
+        git apply $GITHUB_WORKSPACE/patchs/*.patch
 
     - name: Validate root solution selection
       run: |

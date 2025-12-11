@@ -65,10 +65,9 @@ jobs:
       if: ${{ inputs.custom == true }}
       run: |
         cd $GITHUB_WORKSPACE
-        git clone https://github.com/TapetalArray/GKI-Custom.git gki-patch
-        cp ./gki-patch/config/gki_defconfig-android12-5.10 ./android-kernel/common/arch/arm64/configs/gki_defconfig
+        cp ./config/gki_defconfig-android12-5.10 ./android-kernel/common/arch/arm64/configs/gki_defconfig
         cd ./android-kernel/common
-        git apply $GITHUB_WORKSPACE/gki-patch/patchs/*.patch
+        git apply $GITHUB_WORKSPACE/patchs/*.patch
 
     - name: Validate root solution selection
       run: |
